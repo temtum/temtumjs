@@ -1,0 +1,44 @@
+{
+  "name": "temtumjs",
+  "version": "1.0.1",
+  "description": "Temtum JavaScript Library",
+  "keywords": [
+    "temtum",
+    "temtumjs",
+    "javascript"
+  ],
+  "main": "./index.js",
+  "homepage": "https://github.com/temtum/temtumjs",
+  "bugs": {
+    "url": "https://github.com/temtum/temtumjs/issues"
+  },
+  "scripts": {
+    "test": "jest",
+    "build": "mkdir -p dist && babel src --out-dir dist",
+    "prepublish": "npm run build"
+  },
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/temtum/temtumjs"
+  },
+  "dependencies": {
+    "request": "2.88.0",
+    "request-promise-native": "1.0.7",
+    "secp256k1": "3.7.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.4.4",
+    "@babel/core": "7.4.5",
+    "@babel/preset-env": "7.4.5",
+    "babel-preset-minify": "0.5.0",
+    "husky": "3.0.0",
+    "jest": "24.8.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run test && npm run build"
+    }
+  }
+}

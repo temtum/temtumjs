@@ -1,0 +1,9 @@
+coverage
+doc
+node_modules
+npm-debug.log
+.idea
+.env
+.srl
+.vscode
+.history
