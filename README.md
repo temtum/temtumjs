@@ -36,7 +36,7 @@ const wallet = new Wallet(API_URL);
 // Get unspent outputs of your wallet. If you already have any, you can add it using Transaction.addInput method
 wallet.getUnspent(PUBLIC_KEY).then((response) => {
   // Use unspent outputs as inputs for the new transaction
-  const txHex = transaction.create(response.unspentTxOuts, PRIVATE_KEY);
+  const txHex = transaction.create(response.unspentTxOuts, '<recipient_address>', <amount>, PRIVATE_KEY);
   
   // Send the transaction to Temtum node
   wallet.sendTransaction(txHex).then(() => {
