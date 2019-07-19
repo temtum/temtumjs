@@ -51,13 +51,35 @@ class Transaction {
     this.txOuts = [];
   }
 
-  create(utxo, recipientAddress, amount, privateKey) {
-    if (!utxo.length) {
+  hasValidUtxo(utxo) {
+    const len = utxo.length;
+
+    if (!len) {
       throw new Error('Wrong UTXO');
     }
 
-    if (!privateKey || privateKey.length !== 64) {
-      throw new Error('Wrong privateKey');
+    for (let i = 0; i < len; i++) {
+      const item = utxo[i];
+
+      if (!Number.isInteger(item.amount) || item.amount < 1) {
+        throw new Error('Wrong input amount.');
+      }
+    }
+  }
+
+  create(utxo, recipientAddress, amount, privateKey) {
+    this.hasValidUtxo(utxo);
+
+    if (!/^([0-9A-Fa-f]{64})+$/.test(privateKey)) {
+      throw new Error('Wrong private key.');
+    }
+
+    if (!/^([0-9A-Fa-f]{66})+$/.test(recipientAddress)) {
+      throw new Error('Wrong recipient address.');
+    }
+
+    if (!Number.isInteger(amount) || amount < 1) {
+      throw new Error('Wrong amount.');
     }
 
     const senderAddress = utxo[0].address;
