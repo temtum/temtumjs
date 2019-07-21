@@ -13,6 +13,22 @@ class Transaction {
       .digest('hex');
   }
 
+  static hasValidUtxo(utxo) {
+    const len = utxo.length;
+
+    if (!len) {
+      throw new Error('Wrong UTXO.');
+    }
+
+    for (let i = 0; i < len; i++) {
+      const item = utxo[i];
+
+      if (!Number.isInteger(item.amount) || item.amount < 1) {
+        throw new Error('Wrong input amount.');
+      }
+    }
+  }
+
   static signInput(params, privateKey) {
     const key = Transaction.sha256Hex(params.join(''));
     const message = secp256k1.sign(
@@ -51,24 +67,8 @@ class Transaction {
     this.txOuts = [];
   }
 
-  hasValidUtxo(utxo) {
-    const len = utxo.length;
-
-    if (!len) {
-      throw new Error('Wrong UTXO');
-    }
-
-    for (let i = 0; i < len; i++) {
-      const item = utxo[i];
-
-      if (!Number.isInteger(item.amount) || item.amount < 1) {
-        throw new Error('Wrong input amount.');
-      }
-    }
-  }
-
   create(utxo, recipientAddress, amount, privateKey) {
-    this.hasValidUtxo(utxo);
+    Transaction.hasValidUtxo(utxo);
 
     if (!/^([0-9A-Fa-f]{64})+$/.test(privateKey)) {
       throw new Error('Wrong private key.');
