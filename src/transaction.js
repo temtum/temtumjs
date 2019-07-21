@@ -83,6 +83,11 @@ class Transaction {
     }
 
     const senderAddress = utxo[0].address;
+
+    if (senderAddress === recipientAddress) {
+      throw new Error('The sender address cannot match the recipient address.');
+    }
+
     const generatedAddress = secp256k1.publicKeyCreate(Buffer.from(privateKey, 'hex'));
 
     if (generatedAddress.toString('hex') !== senderAddress) {
