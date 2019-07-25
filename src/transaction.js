@@ -70,11 +70,11 @@ class Transaction {
   create(utxo, recipientAddress, amount, privateKey) {
     Transaction.hasValidUtxo(utxo);
 
-    if (!/^([0-9A-Fa-f]{64})+$/.test(privateKey)) {
+    if (!/^([0-9A-Fa-f]{64})$/.test(privateKey)) {
       throw new Error('Wrong private key.');
     }
 
-    if (!/^([0-9A-Fa-f]{66})+$/.test(recipientAddress)) {
+    if (!/^([0-9A-Fa-f]{66})$/.test(recipientAddress)) {
       throw new Error('Wrong recipient address.');
     }
 
