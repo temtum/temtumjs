@@ -3,7 +3,7 @@ const secp256k1 = require('secp256k1');
 
 class Transaction {
   static getTimestamp() {
-    return Math.round(new Date().getTime() / 1000);
+    return Math.floor(Date.now() / 1000);
   }
 
   static sha256Hex(data) {
