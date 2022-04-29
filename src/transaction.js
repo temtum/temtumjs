@@ -1,9 +1,11 @@
 const crypto = require('crypto');
+const fs = require('fs');
 const secp256k1 = require('secp256k1');
+const zstd = require('zstd-lib');
 
 class Transaction {
   static getTimestamp() {
-    return Math.round(new Date().getTime() / 1000);
+    return Math.floor(Date.now() / 1000);
   }
 
   static sha256Hex(data) {
@@ -61,8 +63,8 @@ class Transaction {
     }
   }
 
-  constructor() {
-    this.type = 'regular';
+  constructor(type) {
+    this.type = type ? type : 'regular';
     this.txIns = [];
     this.txOuts = [];
   }
@@ -139,6 +141,93 @@ class Transaction {
 
     this.id = Transaction.sha256Hex(params.join(''));
     this.txIns = Transaction.signInputs(this.id, utxo, privateKey);
+  }
+
+  createWithData(senderAddress, recipientAddress, data, dataHash){
+    this.timestamp = Transaction.getTimestamp();
+
+    if (data) {
+      if (data[0].toString() === '37' 
+      && data[1].toString() === '80' 
+      && data[2].toString() === '68' 
+      && data[3].toString() === '70' 
+      && data[4].toString() === '45') {
+
+        data = zstd.compressSync(data, { level: 5 });
+        const txData = [...data];
+
+        this.txIns = [];
+        this.txOuts = [
+          {
+            address: senderAddress,
+            amount: 0,
+            dataHash: '',
+            data: {
+              type: 'pdf',
+              data: txData
+            }
+          }
+        ];
+  
+        this.txOuts[0].dataHash = Transaction.sha256Hex(this.txOuts[0].data.data.join(''));
+  
+        this.signData();
+  
+        this.txOuts[0].dataHash = '';
+      } else {
+        throw new Error(
+          'Wrong data type.'
+        );
+      }
+    } else {
+      this.txIns = [
+        {
+          address: senderAddress,
+          amount: 0,
+          dataHash: dataHash
+        }
+      ];
+      this.txOuts = [
+        {
+          address: recipientAddress,
+          amount: 0,
+          dataHash: dataHash
+        }
+      ];
+
+      this.signData();
+    }
+
+    const tx = {
+      type: this.type,
+      txIns: this.txIns,
+      txOuts: this.txOuts,
+      timestamp: this.timestamp,
+      id: this.id,
+    };
+
+    console.log(Buffer.from(JSON.stringify(tx)).toString('hex'));
+
+    return Buffer.from(JSON.stringify(tx)).toString('hex');
+  }
+
+  signData() {
+    const outputs = JSON.stringify(this.txOuts, (key, value) => {
+      if (key === 'data') {
+        return undefined;
+      }
+
+      return value;
+    });
+
+    const params = [
+      this.type,
+      this.timestamp,
+      JSON.stringify(this.txIns),
+      outputs
+    ];
+
+    this.id = Transaction.sha256Hex(params.join(''));
   }
 }
 
