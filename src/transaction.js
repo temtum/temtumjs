@@ -206,8 +206,6 @@ class Transaction {
       id: this.id,
     };
 
-    console.log(Buffer.from(JSON.stringify(tx)).toString('hex'));
-
     return Buffer.from(JSON.stringify(tx)).toString('hex');
   }
 
