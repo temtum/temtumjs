@@ -143,7 +143,7 @@ class Transaction {
     this.txIns = Transaction.signInputs(this.id, utxo, privateKey);
   }
 
-  createWithData(senderAddress, recipientAddress, data, dataHash){
+  createWithData(senderAddress, recipientAddress, data, dataHash, privateKey){
     this.timestamp = Transaction.getTimestamp();
 
     if (data) {
@@ -171,7 +171,7 @@ class Transaction {
   
         this.txOuts[0].dataHash = Transaction.sha256Hex(this.txOuts[0].data.data.join(''));
   
-        this.signData();
+        this.signData(privateKey);
   
         this.txOuts[0].dataHash = '';
       } else {
@@ -195,7 +195,7 @@ class Transaction {
         }
       ];
 
-      this.signData();
+      this.signData(privateKey);
     }
 
     const tx = {
@@ -209,7 +209,7 @@ class Transaction {
     return Buffer.from(JSON.stringify(tx)).toString('hex');
   }
 
-  signData() {
+  signData(privateKey) {
     const outputs = JSON.stringify(this.txOuts, (key, value) => {
       if (key === 'data') {
         return undefined;
@@ -226,6 +226,31 @@ class Transaction {
     ];
 
     this.id = Transaction.sha256Hex(params.join(''));
+
+    if (this.txIns[0]) {
+      this.txIns = Transaction.signDataInputs(this.id, this.txIns, privateKey);
+    } else {
+      this.txOuts = Transaction.signDataInputs(this.id, this.txOuts, privateKey);
+    }
+  }
+
+  static signDataInputs(id, tx, privateKey) {
+    const input = tx[0];
+    const params = [
+      id,
+      input.amount,
+      input.address,
+      input.dataHash
+    ];
+
+    const key = Transaction.sha256Hex(params.join(''));
+    const message = secp256k1.sign(
+      Buffer.from(key, 'hex'),
+      Buffer.from(privateKey, 'hex')
+    );
+    input.signature = message.signature.toString('hex');
+
+    return tx;
   }
 }
 
