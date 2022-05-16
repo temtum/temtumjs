@@ -20,11 +20,8 @@ class Wallet {
   }
 
   getSignatureForTokenCreation(address, privateKey) {
-    const timestamp = Transaction.getTimestamp();
-
     const params = [
-      address,
-      timestamp
+      address
     ];
 
     const key = Transaction.sha256Hex(params.join(''));
