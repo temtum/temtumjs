@@ -19,9 +19,10 @@ class Wallet {
     this.url = url;
   }
 
-  getSignatureForTokenCreation(address, privateKey) {
+  getTokenForDataCreation(address, privateKey, expirationTime) {
     const params = [
-      address
+      address,
+      expirationTime
     ];
 
     const key = Transaction.sha256Hex(params.join(''));
@@ -35,7 +36,7 @@ class Wallet {
     request({
       method: 'POST',
       url: `${this.url}/address/${address}/createToken`,
-      json: {signature}
+      json: {signature, expirationTime}
     })
       .then(res => {
         return res.token;
