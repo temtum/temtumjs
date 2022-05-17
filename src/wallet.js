@@ -1,7 +1,6 @@
 const request = require('request-promise-native');
 const crypto = require('crypto');
 const secp256k1 = require('secp256k1');
-require('regenerator-runtime/runtime');
 
 const Transaction = require('./transaction');
 
@@ -20,7 +19,7 @@ class Wallet {
     this.url = url;
   }
 
-  async getTokenForDataCreation(address, privateKey, expirationTime) {
+  getTokenForDataCreation(address, privateKey, expirationTime) {
     const params = [
       address,
       expirationTime
@@ -39,15 +38,8 @@ class Wallet {
       url: `${this.url}/address/${address}/createToken`,
       json: {signature, expirationTime}
     }
+    return request(options);
 
-    try {
-      const response = await request(options);
-
-      return Promise.resolve(response.token);
-    } 
-    catch (err) {
-      Promise.reject(err)
-    }
   }
 
   sendTransaction(txHex) {
