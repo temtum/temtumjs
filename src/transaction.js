@@ -156,10 +156,16 @@ class Transaction {
         data = zstd.compressSync(data, { level: 5 });
         const txData = [...data];
 
-        this.txIns = [];
-        this.txOuts = [
+        this.txIns = [
           {
             address: senderAddress,
+            amount: 0,
+            dataHash: '',
+          }
+        ];
+        this.txOuts = [
+          {
+            address: recipientAddress,
             amount: 0,
             dataHash: '',
             data: {
@@ -170,6 +176,7 @@ class Transaction {
         ];
   
         this.txOuts[0].dataHash = Transaction.sha256Hex(this.txOuts[0].data.data.join(''));
+        this.txIns[0].dataHash = Transaction.sha256Hex(this.txOuts[0].data.data.join(''));
   
         this.signData(privateKey);
   
@@ -227,11 +234,7 @@ class Transaction {
 
     this.id = Transaction.sha256Hex(params.join(''));
 
-    if (this.txIns[0]) {
-      this.txIns = Transaction.signDataInputs(this.id, this.txIns, privateKey);
-    } else {
-      this.txOuts = Transaction.signDataInputs(this.id, this.txOuts, privateKey);
-    }
+    this.txIns = Transaction.signDataInputs(this.id, this.txIns, privateKey);
   }
 
   static signDataInputs(id, tx, privateKey) {
