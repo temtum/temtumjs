@@ -36,9 +36,17 @@ class Wallet {
     const options = {
       method: 'POST',
       url: `${this.url}/address/${address}/createToken`,
-      json: {signature, expirationTime}
+      json: {signature, expirationTime},
+      resolveWithFullResponse: true
     }
-    return request(options);
+    request(options)
+      .then(res => {
+        console.log(res.token);
+        return res.token;
+      })
+      .catch(err => {
+        console.log(err);
+      })
 
   }
 
