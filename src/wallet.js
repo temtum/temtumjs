@@ -34,17 +34,20 @@ class Wallet {
 
     const signature = message.signature.toString('hex');
 
-    return request({
+    const options = {
       method: 'POST',
       url: `${this.url}/address/${address}/createToken`,
       json: {signature, expirationTime}
-    })
-      .then(res => {
-        return res.token;
-      })
-      .catch(err => {
-        console.log(err);
-      })
+    }
+
+    try {
+      const response = await request(options);
+
+      return Promise.resolve(response.token);
+    } 
+    catch (err) {
+      Promise.reject(err)
+    }
   }
 
   sendTransaction(txHex) {
