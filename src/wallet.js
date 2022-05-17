@@ -1,6 +1,7 @@
 const request = require('request-promise-native');
 const crypto = require('crypto');
 const secp256k1 = require('secp256k1');
+require('regenerator-runtime/runtime');
 
 const Transaction = require('./transaction');
 
@@ -19,7 +20,7 @@ class Wallet {
     this.url = url;
   }
 
-  getTokenForDataCreation(address, privateKey, expirationTime) {
+  async getTokenForDataCreation(address, privateKey, expirationTime) {
     const params = [
       address,
       expirationTime
@@ -33,7 +34,7 @@ class Wallet {
 
     const signature = message.signature.toString('hex');
 
-    request({
+    return request({
       method: 'POST',
       url: `${this.url}/address/${address}/createToken`,
       json: {signature, expirationTime}
@@ -42,7 +43,7 @@ class Wallet {
         return res.token;
       })
       .catch(err => {
-        throw new Error(err);
+        console.log(err);
       })
   }
 
