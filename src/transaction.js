@@ -143,7 +143,7 @@ class Transaction {
     this.txIns = Transaction.signInputs(this.id, utxo, privateKey);
   }
 
-  createWithData(senderAddress, recipientAddress, data, dataHash, privateKey, token){
+  createWithData(senderAddress, recipientAddress, data, dataHash, privateKey, token, additionalData = {}){
     this.timestamp = Transaction.getTimestamp();
 
     if (data) {
@@ -172,7 +172,8 @@ class Transaction {
             data: {
               type: 'pdf',
               data: txData
-            }
+            },
+            additionalData: additionalData
           }
         ];
   
@@ -200,7 +201,8 @@ class Transaction {
         {
           address: recipientAddress,
           amount: 0,
-          dataHash: dataHash
+          dataHash: dataHash,
+          additionalData: additionalData
         }
       ];
 
